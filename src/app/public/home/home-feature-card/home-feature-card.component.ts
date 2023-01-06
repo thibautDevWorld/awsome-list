@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
 @Component({
   selector: 'al-home-feature-card',
@@ -7,5 +7,8 @@ import { Component } from '@angular/core';
   ]
 })
 export class HomeFeatureCardComponent {
-
+ @Input() description: string = '';
+ @Input() icon: string = '';
+ @Input() title: string = '';
 }
+
