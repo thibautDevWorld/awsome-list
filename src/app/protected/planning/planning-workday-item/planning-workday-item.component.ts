@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 
 @Component({
   selector: 'al-planning-workday-item',
@@ -6,18 +6,38 @@ import { Component, Input } from '@angular/core';
   styles: [
   ]
 })
-export class PlanningWorkdayItemComponent {
-
-  currentWorkday: { dueDate: string, doneTasks: number, remainingTasks: number };
-
-  @Input()
-  set workday(workday: { dueDate: string, doneTasks: number, remainingTasks: number }) {
-
-    this.currentWorkday = workday || {};
-
-    if ('Lundi' === workday.dueDate) {
-      this.currentWorkday.dueDate += '(Aujourd\'hui)';
+export class PlanningWorkdayItemComponent implements OnChanges {
+    @Input() dueDate: string;
+    @Input() doneTasks: number | string;
+    @Input() remainingTasks: number | string;
+     
+    ngOnChanges(changes: SimpleChanges) {
+     for (const propName in changes) {
+      this.update(propName, changes[propName].currentValue);
+     }
     }
-  }
-  get workday() { return this.currentWorkday }
-}
+     
+    update(propName: string, propValue: string|number) {
+     
+     switch (propName) {
+      case 'dueDate': {
+       if ('Lundi' === propValue) { this.dueDate += ' (Aujourd\'hui)'; }
+       break;
+      }
+      case 'doneTasks': {
+       if (0 === propValue) { this.doneTasks = 'Aucune tâche terminé.'; }
+       break;
+      }
+      case 'remainingTasks': {
+       if (0 === propValue) { 
+        this.remainingTasks = 'Journée de travail terminée !';
+       } 
+       break;
+      }
+      default: {
+       break;
+      }
+     }
+    }
+     
+   }

@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators'
+import { delay } from 'rxjs/operators';
 
 @Component({
   selector: 'al-planning-workday-list',
@@ -9,14 +9,20 @@ import { delay } from 'rxjs/operators'
   styles: [
   ]
 })
-export class PlanningWorkdayListComponent {
+export class PlanningWorkdayListComponent implements OnInit {
+  
   workdays$: Observable<{ dueDate: string, doneTasks: number, remainingTasks: number }[]>;
-
-  ngOnInit(): void {
-    this.workdays$ = of([
-      { dueDate: 'Lundi', doneTasks: 1, remainingTasks: 3 },
-      { dueDate: 'Mardi', doneTasks: 0, remainingTasks: 2 },
-      { dueDate: 'Mercredi', doneTasks: 0, remainingTasks: 1 }
-     ]).pipe(delay(1000));
+   
+  constructor() { }
+   
+  ngOnInit() {
+   
+   this.workdays$ = of([
+    { dueDate: 'Vendredi', doneTasks: 1, remainingTasks: 3 },
+    { dueDate: 'Mardi', doneTasks: 1, remainingTasks: 2 },
+    { dueDate: 'Mercredi', doneTasks: 1, remainingTasks: 0 }
+   ]).pipe(delay(1000));
+   
   }
-}
+   
+ }
