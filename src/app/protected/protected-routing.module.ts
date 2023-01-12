@@ -1,9 +1,6 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { PlanningComponent } from './planning/planning/planning.component';
-import { ProfilComponent } from './profil/profil/profil.component';
-import { WorkdayComponent } from './workday/workday/workday.component';
 import { ProtectedComponent } from './protected.component';
 
 
