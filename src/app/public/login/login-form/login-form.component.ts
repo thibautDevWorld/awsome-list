@@ -34,6 +34,6 @@ export class LoginFormComponent implements OnInit {
   submit() {
     console.info(this.email?.value);
     console.info(this.password?.value);
-    this.router.navigate(['/app/login']);
+    this.router.navigate(['app/dashboard']);
   }
 }
