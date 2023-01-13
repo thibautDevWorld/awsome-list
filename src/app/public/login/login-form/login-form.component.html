@@ -1,0 +1,64 @@
+<form
+  novalidate
+  [formGroup]="loginForm"
+  (ngSubmit)="submit()"
+  class="card-body"
+>
+
+  <!-- Champ de l’adresse email -->
+  <div class="form-group mt-4">
+    <label for="email">Email</label>
+    <input
+      id="email"
+      type="email"
+      formControlName="email"
+      class="form-control"
+      placeholder="Votre email"
+      autocorrect="off"
+      autocomplete="off"
+    />
+    <!-- message d'erreurs -->
+    <small
+      *ngIf="email && email.errors && email.dirty"
+      class="form-text text-muted"
+    >
+      <span [hidden]="!email.errors['required']"> Email requis. </span>
+      <span [hidden]="!email.errors['email']">
+        Entrez une adresse email valide.
+      </span>
+    </small>
+  </div>
+
+  <!-- Champ du mot de passe -->
+  <div class="form-group mt-3">
+    <label for="password">Password</label>
+    <input
+      id="password"
+      type="password"
+      formControlName="password"
+      class="form-control"
+      placeholder="Votre mot de passe"
+    />
+    <!-- message d'erreurs -->
+    <small
+      *ngIf="password && password.errors && password.dirty"
+      class="form-text text-muted"
+    >
+      <span [hidden]="!password.errors['required']"> Mot de passe requis. </span>
+      <span [hidden]="!password.errors['minlength']">
+        Le mot de passe doit faire plus de 6 caractères.
+      </span>
+      <span [hidden]="!password.errors['maxlength']">
+        Le mot de passe doit faire moins de 20 caractères.
+      </span>
+    </small>
+  </div>
+
+  <!-- Bouton pour soumettre le formulaire -->
+  <p class="text-center py-3 mt-4">
+    <button type="submit" class="btn" [disabled]="!loginForm.valid"
+    [ngClass]="{'btn-success':loginForm.valid,'btn-default':!loginForm.valid}">
+        Inscription
+    </button>
+  </p>
+</form>
