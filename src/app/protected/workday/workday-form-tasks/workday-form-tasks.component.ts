@@ -1,4 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, Input } from '@angular/core';
+import { FormArray, FormGroup, FormBuilder, Validators } from '@angular/forms';
+
 
 @Component({
   selector: 'al-workday-form-tasks',
@@ -6,6 +8,43 @@ import { Component } from '@angular/core';
   styles: [
   ]
 })
-export class WorkdayFormTasksComponent {
+export class WorkdayFormTasksComponent implements OnInit {
+  
+  @Input() tasks: FormArray;
+  @Input() workdayForm: FormGroup;
+  
+  taskControlList: FormGroup[];
 
-}
+  constructor(private fb: FormBuilder) {}
+   
+  ngOnInit(): void {
+   this.taskControlList = this.tasks.controls as FormGroup[];
+  }
+
+  createTaskForm(): FormGroup {
+    const taskForm: FormGroup = this.fb.group({
+     'title': ['', [
+      Validators.required,
+      Validators.minLength(1),
+      Validators.maxLength(150)
+     ]],
+     'todo': [1, [
+      Validators.required,
+      Validators.min(1),
+      Validators.max(5)
+     ]],
+     'done': 0
+    });
+   
+    return taskForm;
+   }
+
+  onAddedTask() {
+    const task: FormGroup = this.createTaskForm();
+    this.tasks.push(task);
+  }
+
+  onRemovedTask(index: number) {
+    this.tasks.removeAt(index);
+  }
+ }

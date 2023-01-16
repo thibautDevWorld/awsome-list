@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 
 @Component({
   selector: 'al-workday-form-tasks-add',
@@ -7,5 +7,9 @@ import { Component } from '@angular/core';
   ]
 })
 export class WorkdayFormTasksAddComponent {
+  @Output() addedTask = new EventEmitter<void>();
 
+  addTask() {
+    this.addedTask.emit();
+  }
 }

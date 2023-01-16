@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { FormControl } from '@angular/forms';
 
 @Component({
   selector: 'al-workday-form-notes',
@@ -7,5 +8,5 @@ import { Component } from '@angular/core';
   ]
 })
 export class WorkdayFormNotesComponent {
-
+  @Input() notes: FormControl;
 }
