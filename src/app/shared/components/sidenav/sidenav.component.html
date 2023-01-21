@@ -40,6 +40,7 @@
         Profil
       </li>
       <li
+        *ngIf="user?.hasRole('EMPLOYEE')"
         (click)="navigate(parametersPath)"
         [class.list-group-item-success]="isActive(parametersPath)"
         class="list-group-item"

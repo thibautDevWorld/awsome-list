@@ -22,4 +22,7 @@ export class User {
     get roles(): string[] {
      return this.email.endsWith('google.com') ? ['USER', 'EMPLOYEE'] : ['USER'];
     }
+    hasRole(role: string): boolean {
+        return this.roles.includes(role);
+    }
    }
