@@ -18,6 +18,7 @@ import { UsersService } from './users.service';
 import { ErrorService } from './error.service';
 import { LoaderService } from './loader.service';
 import { Router } from '@angular/router';
+import { ToastrService } from './toastr.service';
 
 @Injectable({
   providedIn: 'root',
@@ -33,7 +34,8 @@ export class AuthService {
     private usersService: UsersService,
     private errorService: ErrorService,
     private loaderService: LoaderService,
-    private router: Router
+    private router: Router,
+    private toastrService: ToastrService
   ) {}
 
   public register(
@@ -102,7 +104,7 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('expirationDate'); // Ajoutez cette ligne, 
+    localStorage.removeItem('expirationDate'); // Ajoutez cette ligne,
     localStorage.removeItem('token'); // Et celle-ci aussi,
     localStorage.removeItem('userId'); // Et enfin celle-là !
     this.user.next(null);
@@ -126,5 +128,24 @@ export class AuthService {
   autoLogin(user: User) {
     this.user.next(user);
     this.router.navigate(['app/dashboard']);
+  }
+
+  updateUserState(user: User): Observable<User | null> {
+    this.loaderService.setLoading(true);
+    return this.usersService.update(user).pipe(
+      tap((user) => this.user.next(user)),
+      tap((_) =>
+        this.toastrService.showToastr({
+          category: 'success',
+          message: 'Vos informations ont été mises à jour !',
+        })
+      ),
+      catchError((error) => this.errorService.handleError(error)),
+      finalize(() => this.loaderService.setLoading(false))
+    );
+  }
+
+  get currentUser(): User | null {
+    return this.user.getValue();
   }
 }
