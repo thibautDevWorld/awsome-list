@@ -21,23 +21,72 @@ export class WorkdaysService {
     private dateService: DateService
   ) {}
 
+  getWorkdayByUser(userId: string): any {
+    const url = `${environment.firebase.firestore.baseURL}:runQuery?key=${environment.firebase.apiKey}`;
+    const data = this.getWorkdayByUserQuery(userId);
+    const jwt: string = localStorage.getItem('token')!;
+    
+    const httpOptions = {
+     headers: new HttpHeaders({
+      'Content-Type':  'application/json',
+      'Authorization': `Bearer ${jwt}`
+     })
+    };
+    
+    return this.http.post(url, data, httpOptions).pipe(
+     switchMap((workdaysData: any) => {
+      const workdays: Workday[] = [];
+      workdaysData.forEach((data: any) => {
+       if (data && data.document) {
+        const workday: Workday = this.getWorkdayFromFirestore(data.document.name, data.document.fields);
+        workdays.push(workday);
+       }
+      })
+      return of(workdays);
+     }),
+     catchError(error => this.errorService.handleError(error))
+    );
+   }
 
-  getWorkdayByDate(date: string, userId: string): Observable<Workday|null> {
+   private getWorkdayByUserQuery(userId: string): any {
+    return {
+     'structuredQuery': {
+      'from': [{
+       'collectionId': 'workdays'
+      }],
+      'where': {
+       'fieldFilter': {
+        'field': { 'fieldPath': 'userId' },
+        'op': 'EQUAL',
+        'value': { 'stringValue': userId }
+       }
+      },
+      "orderBy": [{
+       "field": {
+        "fieldPath": "dueDate"
+       },
+       "direction": "DESCENDING"
+      }]
+     }
+    };
+   }
+
+  getWorkdayByDate(date: string, userId: string): Observable<Workday | null> {
     const url = `${environment.firebase.firestore.baseURL}:runQuery?key=${environment.firebase.apiKey}`;
     const data = this.getStructuredQuery(date, userId);
     const jwt: string = localStorage.getItem('token')!;
- 
+
     const httpOptions = {
       headers: new HttpHeaders({
-        'Content-Type':  'application/json',
-        'Authorization': `Bearer ${jwt}`
-      })
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      }),
     };
- 
+
     return this.http.post(url, data, httpOptions).pipe(
       switchMap((data: any) => {
         const document = data[0].document;
-        if(!document) { 
+        if (!document) {
           return of(null);
         }
         return of(this.getWorkdayFromFirestore(document.name, document.fields));
@@ -47,57 +96,59 @@ export class WorkdaysService {
 
   getStructuredQuery(date: string, userId: string): any {
     return {
-      'structuredQuery': {
-        'from': [{
-          'collectionId': 'workdays'
-        }],
-        'where': {
-          'compositeFilter': {
-            'op': 'AND',
-            'filters': [
+      structuredQuery: {
+        from: [
+          {
+            collectionId: 'workdays',
+          },
+        ],
+        where: {
+          compositeFilter: {
+            op: 'AND',
+            filters: [
               {
-                'fieldFilter': {
-                  'field': { 'fieldPath': 'displayDate' },
-                  'op': 'EQUAL',
-                  'value': { 'stringValue': date }
-                }
+                fieldFilter: {
+                  field: { fieldPath: 'displayDate' },
+                  op: 'EQUAL',
+                  value: { stringValue: date },
+                },
               },
               {
-                'fieldFilter': {
-                  'field': { 'fieldPath': 'userId' },
-                  'op': 'EQUAL',
-                  'value': { 'stringValue': userId }
-                }
-              }
-            ]
-          }
+                fieldFilter: {
+                  field: { fieldPath: 'userId' },
+                  op: 'EQUAL',
+                  value: { stringValue: userId },
+                },
+              },
+            ],
+          },
         },
-        'limit': 1
-      }
+        limit: 1,
+      },
     };
   }
 
   private getWorkdayFromFirestore(name: string, fields: any): Workday {
     const tasks: Task[] = [];
     const workdayId: string = name.split('/')[6];
-     
+
     fields.tasks.arrayValue.values.forEach((data: any) => {
       const task: Task = new Task({
         completed: data.mapValue.fields.completed.booleanValue,
         done: data.mapValue.fields.done.integerValue,
         title: data.mapValue.fields.title.stringValue,
-        todo: data.mapValue.fields.todo.integerValue
+        todo: data.mapValue.fields.todo.integerValue,
       });
       tasks.push(task);
     });
-   
+
     return new Workday({
       id: workdayId,
       userId: fields.userId.stringValue,
       notes: fields.notes.stringValue,
       displayDate: fields.displayDate.stringValue,
       dueDate: fields.dueDate.integerValue,
-      tasks: tasks
+      tasks: tasks,
     });
   }
 
@@ -128,27 +179,29 @@ export class WorkdaysService {
   private getWorkdayForFirestore(workday: Workday): any {
     let dueDate: number; // Timestamp traditionnelle en secondes.
     let dueDateMs: number; // Timestamp JavaScript en millisecondes.
-    
-    if(typeof workday.dueDate == 'string') {
-     dueDate = +workday.dueDate;
-     dueDateMs = dueDate * 1000;
+
+    if (typeof workday.dueDate == 'string') {
+      dueDate = +workday.dueDate;
+      dueDateMs = dueDate * 1000;
     } else {
-     dueDate = new Date(workday.dueDate).getTime() / 1000;
-     dueDateMs = dueDate * 1000;
+      dueDate = new Date(workday.dueDate).getTime() / 1000;
+      dueDateMs = dueDate * 1000;
     }
-        
+
     // La nouvelle propriété displayDate est prise en compte.
-    const displayDate: string = this.dateService.getDisplayDate(new Date(dueDateMs)); // La nouvelle propriété displayDate est prise en compte.
+    const displayDate: string = this.dateService.getDisplayDate(
+      new Date(dueDateMs)
+    ); // La nouvelle propriété displayDate est prise en compte.
     const tasks: Object = this.getTaskListForFirestore(workday.tasks);
-    
+
     return {
-     fields: {
-      dueDate: { integerValue: dueDate },
-      displayDate: { stringValue: displayDate },
-      tasks: tasks,
-      notes: { stringValue: workday.notes },
-      userId: { stringValue: workday.userId }
-     }
+      fields: {
+        dueDate: { integerValue: dueDate },
+        displayDate: { stringValue: displayDate },
+        tasks: tasks,
+        notes: { stringValue: workday.notes },
+        userId: { stringValue: workday.userId },
+      },
     };
   }
 
@@ -184,20 +237,21 @@ export class WorkdaysService {
     const data = this.getWorkdayForFirestore(workday);
     const jwt: string = localStorage.getItem('token')!;
     const httpOptions = {
-     headers: new HttpHeaders({
-      'Content-Type':  'application/json',
-      'Authorization': `Bearer ${jwt}`
-     })
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${jwt}`,
+      }),
     };
-    
-    return this.http.patch(url, data, httpOptions).pipe(
-     tap(_ => this.toastrService.showToastr({
-      category: 'success',
-      message: 'Votre journée de travail a été sauvegardée avec succès.'
-     })),
-     catchError(error => this.errorService.handleError(error)),
-     finalize(() => this.loaderService.setLoading(false))
-    );
-   }
 
+    return this.http.patch(url, data, httpOptions).pipe(
+      tap((_) =>
+        this.toastrService.showToastr({
+          category: 'success',
+          message: 'Votre journée de travail a été sauvegardée avec succès.',
+        })
+      ),
+      catchError((error) => this.errorService.handleError(error)),
+      finalize(() => this.loaderService.setLoading(false))
+    );
+  }
 }

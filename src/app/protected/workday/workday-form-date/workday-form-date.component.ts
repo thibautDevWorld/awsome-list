@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormControl, Form } from '@angular/forms';
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { DateService } from 'src/app/core/services/date.service';
