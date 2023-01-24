@@ -16,14 +16,13 @@ export class PlanningWorkdayListComponent implements OnInit {
  
  constructor(
   private authService: AuthService,
-  private workdayService: WorkdaysService) { }
+  private workdaysService: WorkdaysService) { }
  
  ngOnInit() {
    const user: User|null = this.authService.currentUser;
    if(user && user.id) {
        
-    console.log(user.id)
-   this.workdayService.getWorkdayByUser(user.id).subscribe((workdays: Workday[]) => this.workdays = workdays);
+   this.workdaysService.getWorkdayByUser(user.id).subscribe((workdays: Workday[]) => this.workdays = workdays);
   }
  }
  

@@ -3,7 +3,7 @@ import { FormGroup, FormArray, FormBuilder, FormControl } from '@angular/forms';
 import { WorkdaysService } from 'src/app/core/services/workdays.service';
 import { Workday } from 'src/app/shared/models/workday';
 import { AuthService } from 'src/app/core/services/auth.service';
-import { Router } from '@angular/router';
+import { Router, ActivatedRoute } from '@angular/router';
 import { User } from 'src/app/shared/models/user';
 
 @Component({
@@ -19,13 +19,20 @@ export class WorkdayFormComponent implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private workdaysService: WorkdaysService,
-    private authService: AuthService
+    private authService: AuthService,
+    private route: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
-    this.workdayId = '';
-    this.workdayForm = this.createWorkdayForm();
-  }
+    this.route.queryParams.subscribe(params => {
+      this.workdayId = '';
+      this.workdayForm = this.createWorkdayForm();
+      if(params['date']) {
+       const date: Date = new Date(+params['date'] * 1000); // conversion timestamp javascript
+       this.dueDate.setValue(date);
+      }
+     });
+    }
 
   get dueDate() {
     return this.workdayForm.get('dueDate') as FormControl;
