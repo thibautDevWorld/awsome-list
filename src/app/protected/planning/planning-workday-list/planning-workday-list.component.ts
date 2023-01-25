@@ -8,25 +8,31 @@ import { User } from 'src/app/shared/models/user';
 @Component({
   selector: 'al-planning-workday-list',
   templateUrl: './planning-workday-list.component.html',
-  styles: [
-  ]
+  styles: [],
 })
 export class PlanningWorkdayListComponent implements OnInit {
   workdays: Workday[];
- 
- constructor(
-  private authService: AuthService,
-  private workdaysService: WorkdaysService) { }
- 
- ngOnInit() {
-   const user: User|null = this.authService.currentUser;
-   if(user && user.id) {
-       
-   this.workdaysService.getWorkdayByUser(user.id).subscribe((workdays: Workday[]) => this.workdays = workdays);
+
+  constructor(
+    private authService: AuthService,
+    private workdaysService: WorkdaysService
+  ) {}
+
+  ngOnInit() {
+    const user: User | null = this.authService.currentUser;
+    if (user && user.id) {
+      this.workdaysService
+        .getWorkdayByUser(user.id)
+        .subscribe((workdays: Workday[]) => (this.workdays = workdays));
+    }
   }
- }
- 
- onWorkdayRemoved(workday: Workday) {
-  console.info(workday.dueDate);
- }
- }
+
+  onWorkdayRemoved(workday: Workday) {
+    this.workdaysService
+      .remove(workday)
+      .subscribe(
+        (_) =>
+          (this.workdays = this.workdays.filter((el) => el.id !== workday.id))
+      );
+  }
+}
