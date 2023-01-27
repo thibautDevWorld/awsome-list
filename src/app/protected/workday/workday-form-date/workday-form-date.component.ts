@@ -22,6 +22,7 @@ export class WorkdayFormDateComponent implements OnInit {
   selectDate(date: Date): void {
     if(date) {
       const displayDate: string = this.dateService.getDisplayDate(date);
+      console.log(displayDate)
       this.dateSelected.emit(displayDate);
     }
   }

@@ -1,1 +1,15 @@
-<p>Dashboard</p>
+<h1>
+  Tableau de bord
+  <small class="text-muted"> - {{ currentDate }}</small>
+</h1>
+
+<al-dashboard-workday
+  *ngIf="(workday$ | async) as workday; else emptyWorkday"
+  [workday]="workday">
+</al-dashboard-workday>
+ 
+<ng-template #emptyWorkday>
+  <p class="text-center lead m-5">
+    {{ currentUser?.name }}, pas de travail pour aujourd'hui ! <img draggable="false" role="img" class="emoji" alt="🌴" src="https://s.w.org/images/core/emoji/14.0.0/svg/1f334.svg">
+  </p>
+</ng-template>

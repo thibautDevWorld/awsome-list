@@ -1,0 +1,50 @@
+<div *ngIf="!isWorkdayComplete">
+  <al-dashboard-pomodoro-progress
+    *ngIf="isPomodoroActive"
+    [progress]="currentProgress"
+    [maxProgress]="maxProgress"
+  >
+  </al-dashboard-pomodoro-progress>
+
+  <div *ngIf="!isPomodoroActive" class="text-center my-3">
+    <button (click)="startPomodoro()" class="btn btn-success btn-sm">
+      Démarrer le Pomodoro
+    </button>
+  </div>
+
+  <div *ngIf="isPomodoroActive" class="text-center my-3">
+    <button (click)="cancelPomodoro()" class="btn btn-sm mr-1">
+      Annuler le Pomodoro
+    </button>
+    <button (click)="completePomodoro()" class="btn btn-success btn-sm">
+      Terminé le Pomodoro
+    </button>
+  </div>
+
+  <div>
+    <al-dashboard-task-item *ngFor="let task of workday.tasks" [task]="task">
+    </al-dashboard-task-item>
+  </div>
+</div>
+
+<div *ngIf="isWorkdayComplete" class="text-center mt-5">
+  <p *ngFor="let task of workday.tasks">
+    <s>{{ task.title }}</s>
+  </p>
+  <p class="display-4">
+    Job Done !
+    <img
+      draggable="false"
+      role="img"
+      class="emoji"
+      alt="🎉"
+      src="https://s.w.org/images/core/emoji/14.0.0/svg/1f389.svg"
+    /><img
+      draggable="false"
+      role="img"
+      class="emoji"
+      alt="👍"
+      src="https://s.w.org/images/core/emoji/14.0.0/svg/1f44d.svg"
+    />
+  </p>
+</div>
